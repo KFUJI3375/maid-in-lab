@@ -5,6 +5,7 @@ signal state_changed(state: String)
 signal temperature_changed(temp: float)
 signal progress_changed(progress: float)
 signal potion_created(potion: Potion)
+signal solution_color_changed(color: Color) # 新規：溶液の色変化
 
 const HEATING_RATE = 10.0
 const COOLING_RATE = 5.0
@@ -16,12 +17,13 @@ func start_with_herb(herb: Herb) -> void:
 	alchemy_process = AlchemyProcess.new(herb)
 	alchemy_process.progress_updated.connect(_on_progress_updated)
 	alchemy_process.completed.connect(_on_potion_completed)
+	alchemy_process.solution_updated.connect(_on_solution_updated) # 新規
 	change_state("薬草投入完了")
 
 func toggle_heating() -> bool:
 	if not alchemy_process:
 		return false
-	
+
 	alchemy_process.is_active = not alchemy_process.is_active
 	if alchemy_process.is_active:
 		change_state("加熱中")
@@ -44,3 +46,7 @@ func _on_progress_updated(progress: float) -> void:
 func _on_potion_completed(potion: Potion) -> void:
 	change_state("完成！%s の%sができました！" % [potion.get_quality_text(), potion.name])
 	potion_created.emit(potion)
+
+func _on_solution_updated(solution: Solution) -> void:
+	# 溶液の色を通知
+	solution_color_changed.emit(solution.color)
