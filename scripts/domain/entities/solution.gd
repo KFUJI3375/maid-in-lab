@@ -3,6 +3,7 @@ extends RefCounted
 
 signal color_changed(new_color: Color)
 signal concentration_changed(concentration: float)
+signal volume_changed(new_volume: float) # 新規：蒸発検知
 
 # 抽出された成分
 class ExtractedIngredient extends RefCounted:
@@ -22,45 +23,68 @@ class ExtractedIngredient extends RefCounted:
 # 溶液の成分（後方互換性のため維持）
 class Component extends RefCounted:
 	var name: String
+	var type: String # 新規：成分タイプ（water_soluble, oil_soluble, volatile）
 	var concentration: float # 濃度 (0-100%)
 
-	func _init(p_name: String, p_concentration: float = 0.0):
+	func _init(p_name: String, p_type: String, p_concentration: float = 0.0):
 		name = p_name
+		type = p_type
 		concentration = p_concentration
 
 # 溶液の状態
+var solvent: Solvent # 新規：溶媒
 var components: Array[Component] = []
-var extracted_ingredients: Array[ExtractedIngredient] = []  # 新規
-var color: Color = Color(0.8, 0.8, 1.0, 0.3) # 初期は透明に近い
+var color: Color = Color(0.8, 0.8, 1.0, 0.3)
 var volume: float = 100.0 # ml
 var temperature: float = 20.0
 var herb: Herb  # 追加された薬草の参照
 
-func _init():
-	pass
-
-# 薬草を追加
-func add_herb(p_herb: Herb) -> void:
-	herb = p_herb
-	var component = Component.new(p_herb.name, 0.0)
-	components.append(component)
-	
-	# 有効成分をリストに追加
-	for ingredient in p_herb.active_ingredients:
-		var extracted = ExtractedIngredient.new(ingredient)
-		extracted_ingredients.append(extracted)
-	
+func _init(p_solvent: Solvent = null):
+	# デフォルトは水
+	solvent = p_solvent if p_solvent else Solvent.create_water()
 	update_color()
 
-# 成分を抽出（加熱と繊維破壊による）
-func extract_component(component_name: String, amount: float) -> void:
+# 薬草を追加
+func add_herb(herb: Herb) -> void:
+	# 各成分タイプごとにComponentを作成
+	for component_type in herb.components:
+		var component_name = "%s(%s)" % [herb.name, component_type]
+		var component = Component.new(component_name, component_type, 0.0)
+		components.append(component)
+
+	update_color()
+
+# 成分を抽出（加熱による）
+func extract_component(herb: Herb, amount: float) -> void:
 	for component in components:
-		if component.name == component_name:
-			component.concentration += amount
+		# この成分が薬草由来か確認
+		if component.name.begins_with(herb.name):
+			# 溶媒の抽出効率を考慮
+			var efficiency = solvent.get_efficiency(component.type)
+			var extraction_amount = amount * efficiency
+
+			component.concentration += extraction_amount
 			component.concentration = min(component.concentration, 100.0)
+
 			concentration_changed.emit(component.concentration)
 			update_color()
-			break
+
+# 蒸発処理（新規）
+func process_evaporation(delta: float) -> void:
+	var evaporation = solvent.calculate_evaporation(temperature, delta)
+	if evaporation > 0:
+		volume -= evaporation
+		volume = max(volume, 10.0) # 最低10ml残る
+		volume_changed.emit(volume)
+
+		# 体積が減ると濃度が上がる
+		update_concentration_by_volume()
+
+func update_concentration_by_volume() -> void:
+	# 蒸発による濃縮効果
+	var concentration_factor = 100.0 / volume
+	for component in components:
+		component.concentration = min(component.concentration * concentration_factor, 100.0)
 
 # 新規：繊維破壊度に応じた成分抽出
 func extract_ingredients(fiber_breakdown: float, delta: float) -> void:

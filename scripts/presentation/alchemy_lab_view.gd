@@ -5,6 +5,7 @@ extends Control
 @onready var temp_label = $UIContainer/TempLabel
 @onready var time_label = $UIContainer/TimeLabel
 @onready var status_label = $UIContainer/StatusLabel
+@onready var volume_label = $UIContainer/VolumeLabel # 新規：体積表示
 @onready var add_herb_button = $UIContainer/AddHerbButton
 @onready var heat_button = $UIContainer/HeatButton
 
@@ -12,7 +13,6 @@ extends Control
 var brew_use_case: BrewPotionUseCase
 
 var brewing_time: float = 0.0
-# FPS表示用（デバッグ）
 var fps_label: Label
 
 func _ready():
@@ -22,6 +22,11 @@ func _ready():
 	fps_label.add_theme_color_override("font_color", Color.YELLOW)
 	add_child(fps_label)
 
+	# 体積ラベル作成（シーンになければ）
+	if not volume_label:
+		volume_label = Label.new()
+		# ... 配置とスタイル設定
+
 	brew_use_case = BrewPotionUseCase.new()
 
 	# Use Caseのシグナル接続
@@ -29,7 +34,8 @@ func _ready():
 	brew_use_case.temperature_changed.connect(_on_temperature_changed)
 	brew_use_case.progress_changed.connect(_on_progress_changed)
 	brew_use_case.potion_created.connect(_on_potion_created)
-	brew_use_case.solution_color_changed.connect(_on_solution_color_changed) # 新規
+	brew_use_case.solution_color_changed.connect(_on_solution_color_changed)
+	brew_use_case.volume_changed.connect(_on_volume_changed) # 新規
 
 	# UIボタンのシグナル接続
 	add_herb_button.pressed.connect(_on_add_herb_pressed)
@@ -67,8 +73,17 @@ func _on_progress_changed(progress: float):
 	status_label.text = "成分抽出: %.1f%%" % progress
 
 func _on_solution_color_changed(color: Color):
-	# 溶液の色が変化したらビーカーの色を更新
 	beaker_rect.color = color
+
+func _on_volume_changed(volume: float):
+	if volume_label:
+		volume_label.text = "体積: %.1f ml" % volume
+
+	# 警告表示
+	if volume < 30.0:
+		volume_label.add_theme_color_override("font_color", Color.RED)
+	else:
+		volume_label.add_theme_color_override("font_color", Color.WHITE)
 
 func _on_potion_created(potion: Potion):
 	heat_button.disabled = true

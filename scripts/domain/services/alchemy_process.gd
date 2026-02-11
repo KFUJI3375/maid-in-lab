@@ -3,24 +3,27 @@ extends RefCounted
 
 signal progress_updated(percentage: float)
 signal completed(potion: Potion)
-signal solution_updated(solution: Solution) # 新規：溶液の状態変化
-signal fiber_breakdown_info(breakdown: float)  # 新規：繊維破壊度の情報
+signal solution_updated(solution: Solution)
+signal evaporation_warning(remaining_volume: float) # 新規：蒸発警告
 
 var herb: Herb
 var temperature: Temperature
-var solution: Solution # 新規：溶液オブジェクト
-var progress: float = 0.0 # 0-100
-var fiber_breakdown: float = 0.0  # 新規：繊維破壊度 (0-100)
+var solution: Solution
+var progress: float = 0.0
 var is_active: bool = false
 
-func _init(p_herb: Herb):
+func _init(p_herb: Herb, p_solvent: Solvent = null):
 	herb = p_herb
 	temperature = Temperature.new()
-	solution = Solution.new() # 溶液を生成
-	solution.add_herb(herb) # 薬草を溶液に追加
+
+	# 溶媒を指定（デフォルトは水）
+	var solvent = p_solvent if p_solvent else Solvent.create_water()
+	solution = Solution.new(solvent)
+	solution.add_herb(herb)
 
 	# 溶液のシグナルを転送
 	solution.color_changed.connect(_on_solution_color_changed)
+	solution.volume_changed.connect(_on_volume_changed)
 
 func start_heating() -> void:
 	is_active = true
@@ -38,24 +41,18 @@ func update(delta: float, heating_rate: float, cooling_rate: float) -> void:
 	# 溶液の温度も更新
 	solution.temperature = temperature.value
 
-	# 繊維破壊プロセス
+	# 蒸発処理
+	solution.process_evaporation(delta)
+
+	# 細胞壁破壊プロセス
 	if temperature.value >= 60.0:
-		# 植物構造の分解効率を計算
-		var decomposition_efficiency = herb.plant_structure.calculate_decomposition_efficiency(temperature.value)
-		
-		# 繊維破壊速度（繊維強度に基づく）
-		var breakdown_rate = decomposition_efficiency * delta * 100.0 / herb.plant_structure.fiber_strength
-		fiber_breakdown += breakdown_rate
-		fiber_breakdown = min(fiber_breakdown, 100.0)
-		
-		# 繊維破壊度を通知
-		fiber_breakdown_info.emit(fiber_breakdown)
-		
-		# 繊維破壊度に応じた成分抽出
-		solution.extract_ingredients(fiber_breakdown, delta)
-		
-		# 進捗は総効力に基づく
-		progress = solution.get_total_effective_potency()
+		var efficiency = calculate_efficiency()
+		var extraction_rate = efficiency * delta * 10.0
+
+		# 成分を抽出（溶媒の効率が自動的に考慮される）
+		solution.extract_component(herb, extraction_rate)
+
+		progress += extraction_rate
 		progress = min(progress, 100.0)
 		progress_updated.emit(progress)
 
@@ -67,12 +64,17 @@ func update(delta: float, heating_rate: float, cooling_rate: float) -> void:
 			completed.emit(potion)
 
 func calculate_efficiency() -> float:
-	# 後方互換性のため維持（現在は使用されていない）
-	return herb.plant_structure.calculate_decomposition_efficiency(temperature.value)
+	var temp_diff = abs(temperature.value - herb.optimal_temperature)
+	if temp_diff <= 5.0:
+		return 2.0
+	elif temp_diff <= 15.0:
+		return 1.0
+	else:
+		return 0.5
 
 func create_potion() -> Potion:
 	var quality = determine_quality()
-	return solution.create_potion(quality) # 溶液からポーションを生成
+	return solution.create_potion(quality)
 
 func determine_quality() -> Potion.Quality:
 	# 温度管理と成分効力の両方で評価
@@ -120,3 +122,8 @@ func calculate_potency_quality() -> Potion.Quality:
 func _on_solution_color_changed(new_color: Color) -> void:
 	# 溶液の色変化を上位レイヤーに通知
 	pass
+
+func _on_volume_changed(new_volume: float) -> void:
+	# 蒸発による体積減少を警告
+	if new_volume < 30.0:
+		evaporation_warning.emit(new_volume)
