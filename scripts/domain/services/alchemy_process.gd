@@ -100,7 +100,7 @@ func calculate_potency_quality() -> Potion.Quality:
 	var max_possible = 0.0
 	
 	# 最大可能効力を計算
-	for ingredient in self.herb.active_ingredients:
+	for ingredient in herb.active_ingredients:
 		max_possible += ingredient.concentration
 	
 	if max_possible <= 0:
