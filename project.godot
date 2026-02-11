@@ -11,7 +11,9 @@ config_version=5
 [application]
 
 config/name="Maid in Lab"
+run/main_scene="uid://k7kxflfcrrea"
 config/features=PackedStringArray("4.6", "GL Compatibility")
+run/max_fps=60
 config/icon="res://icon.svg"
 
 [dotnet]

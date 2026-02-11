@@ -1,18 +1,26 @@
 [gd_scene format=3 uid="uid://k7kxflfcrrea"]
 
-[ext_resource type="Script" uid="uid://bovqlbdwaboov" path="res://scripts/presentation/alchemy_lab_view.gd" id="1_7n35r"]
+[ext_resource type="Script" uid="uid://q57qafvutpni" path="res://scripts/presentation/alchemy_lab_view.gd" id="1_7n35r"]
 
 [node name="AlchemyLab" type="Control" unique_id=1013137120]
 layout_mode = 3
 anchors_preset = 0
-offset_right = 40.0
+offset_left = 2.0
+offset_right = 42.0
 offset_bottom = 40.0
 script = ExtResource("1_7n35r")
 
 [node name="BeakerRect" type="ColorRect" parent="." unique_id=1439534973]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 2.0
+anchor_right = 0.5
+anchor_bottom = 2.0
+offset_left = -18.0
+offset_top = -20.0
+offset_right = 22.0
+offset_bottom = 20.0
 
 [node name="UIContainer" type="VBoxContainer" parent="." unique_id=987562441]
 layout_mode = 0

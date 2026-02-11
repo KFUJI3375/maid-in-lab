@@ -12,21 +12,36 @@ extends Control
 var brew_use_case: BrewPotionUseCase
 
 var brewing_time: float = 0.0
+# FPS表示用（デバッグ）
+var fps_label: Label
 
 func _ready():
+	 # FPS表示ラベル作成（デバッグ用）
+	fps_label = Label.new()
+	fps_label.position = Vector2(10, 10)
+	fps_label.add_theme_color_override("font_color", Color.YELLOW)
+	add_child(fps_label)
+
+
 	brew_use_case = BrewPotionUseCase.new()
-	
+
 	# Use Caseのシグナル接続
 	brew_use_case.state_changed.connect(_on_state_changed)
 	brew_use_case.temperature_changed.connect(_on_temperature_changed)
 	brew_use_case.progress_changed.connect(_on_progress_changed)
 	brew_use_case.potion_created.connect(_on_potion_created)
-	
+
 	# UIボタンのシグナル接続
 	add_herb_button.pressed.connect(_on_add_herb_pressed)
 	heat_button.pressed.connect(_on_heat_pressed)
 
 func _process(delta):
+	# FPS表示更新（デバッグ用）
+	fps_label.text = "FPS: %d (Max: %d)" % [
+		Engine.get_frames_per_second(),
+		Engine.max_fps
+	]
+
 	brew_use_case.update(delta)
 	if brew_use_case.alchemy_process and brew_use_case.alchemy_process.is_active:
 		brewing_time += delta
@@ -55,7 +70,7 @@ func _on_potion_created(potion: Potion):
 	beaker_rect.color = potion.color
 	heat_button.disabled = true
 	print("ポーション完成: %s (品質: %s, 効力: %.1f)" % [
-		potion.name, 
-		potion.get_quality_text(), 
+		potion.name,
+		potion.get_quality_text(),
 		potion.potency
 	])
