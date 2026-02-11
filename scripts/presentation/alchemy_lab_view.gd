@@ -25,8 +25,6 @@ func _ready():
 	# UIボタンのシグナル接続
 	add_herb_button.pressed.connect(_on_add_herb_pressed)
 	heat_button.pressed.connect(_on_heat_pressed)
-	
-	update_ui()
 
 func _process(delta):
 	brew_use_case.update(delta)
@@ -61,6 +59,3 @@ func _on_potion_created(potion: Potion):
 		potion.get_quality_text(), 
 		potion.potency
 	])
-
-func update_ui():
-	pass  # 初期化用
