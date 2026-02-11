@@ -38,6 +38,7 @@ func _init(
 	heat_stability = p_heat_stability
 
 # 高温での分解量を計算
+# delta: 経過時間（秒）
 func calculate_degradation(temperature: float, delta: float) -> float:
 	if temperature < 80.0:
 		return 0.0
@@ -45,7 +46,8 @@ func calculate_degradation(temperature: float, delta: float) -> float:
 	# 80度以上で分解開始
 	var temp_factor = (temperature - 80.0) / 20.0  # 0-1 (80-100度)
 	var degradation_rate = (1.0 - heat_stability) * temp_factor
-	return degradation_rate * delta * 10.0  # 1秒で最大10%分解
+	# 1秒あたり最大10%分解（heat_stability=0, temp_factor=1の場合）
+	return degradation_rate * delta * 10.0
 
 # ファクトリーメソッド：回復化合物（水溶性、熱に強い）
 static func create_healing_compound() -> ActiveIngredient:

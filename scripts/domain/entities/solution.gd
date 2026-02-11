@@ -65,6 +65,7 @@ func extract_component(component_name: String, amount: float) -> void:
 # 新規：繊維破壊度に応じた成分抽出
 func extract_ingredients(fiber_breakdown: float, delta: float) -> void:
 	if not herb:
+		push_warning("Solution.extract_ingredients: 薬草が追加されていません")
 		return
 	
 	# 繊維破壊度に応じた抽出速度（0-100%）
@@ -79,6 +80,8 @@ func extract_ingredients(fiber_breakdown: float, delta: float) -> void:
 		# 抽出可能な残り量
 		var remaining = ingredient.concentration - extracted.extracted_amount
 		if remaining > 0:
+			# 抽出速度係数: 5.0 = 理想的な条件で1秒あたり最大5%抽出
+			# これにより完全抽出には約20秒必要（100% / 5%/s = 20s）
 			var extract_amount = extraction_rate * solvent_efficiency * delta * 5.0
 			extract_amount = min(extract_amount, remaining)
 			extracted.extracted_amount += extract_amount
