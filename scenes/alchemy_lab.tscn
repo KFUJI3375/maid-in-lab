@@ -1,0 +1,42 @@
+[gd_scene format=3 uid="uid://k7kxflfcrrea"]
+
+[ext_resource type="Script" uid="uid://bovqlbdwaboov" path="res://scripts/alchemy_lab.gd" id="1_7n35r"]
+
+[node name="AlchemyLab" type="Control" unique_id=1013137120]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_7n35r")
+
+[node name="BeakerRect" type="ColorRect" parent="." unique_id=1439534973]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="UIContainer" type="VBoxContainer" parent="." unique_id=987562441]
+layout_mode = 0
+offset_left = 61.0
+offset_top = 9.0
+offset_right = 101.0
+offset_bottom = 110.0
+
+[node name="TempLabel" type="Label" parent="UIContainer" unique_id=1515697727]
+layout_mode = 2
+text = "温度: 0°C"
+
+[node name="TimeLabel" type="Label" parent="UIContainer" unique_id=1687027220]
+layout_mode = 2
+text = "時間: 0秒"
+
+[node name="StatusLabel" type="Label" parent="UIContainer" unique_id=2055988799]
+layout_mode = 2
+text = "状態: 待機中"
+
+[node name="AddHerbButton" type="Button" parent="UIContainer" unique_id=1856014446]
+layout_mode = 2
+text = "薬草を入れる"
+
+[node name="HeatButton" type="Button" parent="UIContainer" unique_id=1814861761]
+layout_mode = 2
+text = "加熱開始"
