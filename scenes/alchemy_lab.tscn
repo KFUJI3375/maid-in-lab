@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://k7kxflfcrrea"]
 
-[ext_resource type="Script" uid="uid://bovqlbdwaboov" path="res://scripts/alchemy_lab.gd" id="1_7n35r"]
+[ext_resource type="Script" uid="uid://bovqlbdwaboov" path="res://scripts/presentation/alchemy_lab_view.gd" id="1_7n35r"]
 
 [node name="AlchemyLab" type="Control" unique_id=1013137120]
 layout_mode = 3
