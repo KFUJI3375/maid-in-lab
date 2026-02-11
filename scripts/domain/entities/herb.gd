@@ -2,15 +2,37 @@ class_name Herb
 extends RefCounted
 
 var name: String
-var cell_wall_strength: float  # 細胞壁の強度
-var optimal_temperature: float  # 最適温度
+var plant_structure: PlantStructure  # 植物構造
+var active_ingredients: Array[ActiveIngredient]  # 有効成分
 var color: Color
 
-func _init(p_name: String, p_strength: float, p_temp: float, p_color: Color):
+func _init(p_name: String, p_structure: PlantStructure, p_ingredients: Array[ActiveIngredient], p_color: Color):
 	name = p_name
-	cell_wall_strength = p_strength
-	optimal_temperature = p_temp
+	plant_structure = p_structure
+	active_ingredients = p_ingredients
 	color = p_color
 
+# 成分タイプごとの総含有量を計算
+func get_total_concentration_by_type(component_type: ActiveIngredient.ComponentType) -> float:
+	var total = 0.0
+	for ingredient in active_ingredients:
+		if ingredient.component_type == component_type:
+			total += ingredient.concentration
+	return total
+
+# 効果別の成分を取得
+func get_ingredients_by_effect(effect: ActiveIngredient.Effect) -> Array[ActiveIngredient]:
+	var result: Array[ActiveIngredient] = []
+	for ingredient in active_ingredients:
+		if ingredient.effect == effect:
+			result.append(ingredient)
+	return result
+
+# 後方互換性のため維持（新モデルに対応）
 static func create_healing_herb() -> Herb:
-	return Herb.new("回復薬草", 100.0, 80.0, Color(0.6, 0.8, 0.6))
+	var structure = PlantStructure.create_normal_plant()
+	var ingredients: Array[ActiveIngredient] = [
+		ActiveIngredient.create_healing_compound(),
+		ActiveIngredient.create_essential_oil()
+	]
+	return Herb.new("回復薬草", structure, ingredients, Color(0.6, 0.8, 0.6))
