@@ -8,6 +8,7 @@ var herb: Herb
 var temperature: Temperature
 var progress: float = 0.0  # 0-100
 var is_active: bool = false
+var is_completed: bool = false
 
 func _init(p_herb: Herb):
 	herb = p_herb
@@ -27,13 +28,14 @@ func update(delta: float, heating_rate: float, cooling_rate: float) -> void:
 		temperature.decrease(cooling_rate * delta)
 	
 	# 細胞壁破壊プロセス
-	if temperature.value >= 60.0:
+	if temperature.value >= 60.0 and not is_completed:
 		var efficiency = calculate_efficiency()
 		progress += efficiency * delta * 10.0
 		progress = min(progress, 100.0)
 		progress_updated.emit(progress)
 		
 		if progress >= 100.0:
+			is_completed = true
 			var potion = create_potion()
 			completed.emit(potion)
 
