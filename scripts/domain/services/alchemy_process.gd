@@ -77,11 +77,44 @@ func create_potion() -> Potion:
 	return solution.create_potion(quality)
 
 func determine_quality() -> Potion.Quality:
-	if temperature.is_optimal_for(herb.optimal_temperature, 5.0):
+	# 温度管理と成分効力の両方で評価
+	var temp_quality = calculate_temperature_quality()
+	var potency_quality = calculate_potency_quality()
+	
+	# 低い方の品質を採用（両方の要件を満たす必要がある）
+	return min(temp_quality, potency_quality) as Potion.Quality
+
+func calculate_temperature_quality() -> Potion.Quality:
+	var optimal_temp = herb.plant_structure.optimal_decomposition_temp
+	
+	if temperature.is_optimal_for(optimal_temp, 5.0):
 		return Potion.Quality.EXCELLENT
-	elif temperature.is_optimal_for(herb.optimal_temperature, 10.0):
+	elif temperature.is_optimal_for(optimal_temp, 10.0):
 		return Potion.Quality.GOOD
-	elif temperature.is_optimal_for(herb.optimal_temperature, 20.0):
+	elif temperature.is_optimal_for(optimal_temp, 20.0):
+		return Potion.Quality.NORMAL
+	else:
+		return Potion.Quality.POOR
+
+func calculate_potency_quality() -> Potion.Quality:
+	# 成分の有効効力に基づく品質
+	var total_potency = solution.get_total_effective_potency()
+	var max_possible = 0.0
+	
+	# 最大可能効力を計算
+	for ingredient in herb.active_ingredients:
+		max_possible += ingredient.concentration
+	
+	if max_possible <= 0:
+		return Potion.Quality.POOR
+	
+	var efficiency = total_potency / max_possible
+	
+	if efficiency >= 0.9:
+		return Potion.Quality.EXCELLENT
+	elif efficiency >= 0.7:
+		return Potion.Quality.GOOD
+	elif efficiency >= 0.5:
 		return Potion.Quality.NORMAL
 	else:
 		return Potion.Quality.POOR
