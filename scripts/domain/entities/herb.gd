@@ -2,64 +2,58 @@ class_name Herb
 extends RefCounted
 
 var name: String
+var plant_structure: PlantStructure
+var active_ingredients: Array[ActiveIngredient] = []
+
+# 後方互換性のため（削除予定）
+var components: Dictionary = {}
 var cell_wall_strength: float
 var optimal_temperature: float
 var color: Color
 
-# 新規：成分タイプとその含有量
-var components: Dictionary = {
-	"water_soluble": 0.0,
-	"oil_soluble": 0.0,
-	"volatile": 0.0
-}
-
-func _init(p_name: String, p_strength: float, p_optimal_temp: float, p_color: Color, p_components: Dictionary = {}):
+func _init(p_name: String, p_structure: PlantStructure, p_ingredients: Array[ActiveIngredient]):
 	name = p_name
-	cell_wall_strength = p_strength
-	optimal_temperature = p_optimal_temp
-	color = p_color
+	plant_structure = p_structure
+	active_ingredients = p_ingredients
 
-	# デフォルト値を設定
-	if p_components.is_empty():
-		components = {
-			"water_soluble": 60.0, # デフォルトは水溶性が多い
-			"oil_soluble": 20.0,
-			"volatile": 20.0
-		}
-	else:
-		components = p_components
+	# 後方互換性のための値設定
+	cell_wall_strength = p_structure.fiber_strength
+	optimal_temperature = p_structure.optimal_decomposition_temp
+	color = Color(0.6, 0.8, 0.6)
 
-# ファクトリーメソッド更新
-static func create_healing_herb() -> Herb:
-	return Herb.new(
-		"回復薬草",
-		100.0,
-		80.0,
-		Color(0.6, 0.8, 0.6),
-		{
-			"water_soluble": 60.0, # 水に溶けやすい成分が多い
-			"oil_soluble": 25.0,
-			"volatile": 15.0
-		}
-	)
+	# componentsも互換性のため空で初期化
+	components = {
+		"water_soluble": 0.0,
+		"oil_soluble": 0.0,
+		"volatile": 0.0
+	}
 
-# 将来の拡張：芳香薬草（揮発性成分が多い）
-# static func create_aromatic_herb() -> Herb:
-# 	return Herb.new(
-# 		"芳香薬草",
-# 		80.0,
-# 		70.0,
-# 		Color(0.8, 0.7, 0.9),
-# 		{
-# 			"water_soluble": 20.0,
-# 			"oil_soluble": 30.0,
-# 			"volatile": 50.0  # 精油が豊富
-# 		}
-# 	)
+# 表示名を取得
+func get_display_name() -> String:
+	return name
 
-# 総成分量を取得
-func get_total_component_amount() -> float:
+# 特定の効果を持つ成分を取得
+func get_ingredients_by_effect(effect: ActiveIngredient.Effect) -> Array[ActiveIngredient]:
+	var result: Array[ActiveIngredient] = []
+	for ingredient in active_ingredients:
+		if ingredient.effect == effect:
+			result.append(ingredient)
+	return result
+
+# 総有効成分量
+func get_total_ingredient_amount() -> float:
 	var total = 0.0
-	for amount in components.values():
-		total += amount
+	for ingredient in active_ingredients:
+		total += ingredient.concentration
 	return total
+
+# ファクトリーメソッド：回復薬草
+static func create_healing_herb() -> Herb:
+	var structure = PlantStructure.create_normal_plant()
+
+	var ingredients: Array[ActiveIngredient] = [
+		ActiveIngredient.create_healing_compound(),
+		ActiveIngredient.create_essential_oil()
+	]
+
+	return Herb.new("回復薬草", structure, ingredients)
