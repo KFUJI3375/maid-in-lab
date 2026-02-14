@@ -24,10 +24,10 @@ offset_bottom = 20.0
 
 [node name="UIContainer" type="VBoxContainer" parent="." unique_id=987562441]
 layout_mode = 0
-offset_left = 61.0
-offset_top = 9.0
-offset_right = 101.0
-offset_bottom = 110.0
+offset_left = 4.0
+offset_top = 109.0
+offset_right = 100.0
+offset_bottom = 256.0
 
 [node name="TempLabel" type="Label" parent="UIContainer" unique_id=1515697727]
 layout_mode = 2
