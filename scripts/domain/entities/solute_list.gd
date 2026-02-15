@@ -16,8 +16,8 @@ func append(solute: Solute) -> SoluteList:
 	# _solutesに同名の溶質が存在する場合は、量を加算する
 	var has_same_name = false
 	for existing_solute in current_solutes:
-		if existing_solute.name == solute.name:
-			new_solutes.append(Solute.new(existing_solute.name, existing_solute.mass + solute.mass, existing_solute.dissolution_rate))
+		if solute.is_same_name(existing_solute):
+			new_solutes.append(solute.combine(existing_solute))
 			has_same_name = true
 		else:
 			new_solutes.append(existing_solute.duplicate())

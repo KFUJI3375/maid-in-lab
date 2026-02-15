@@ -13,10 +13,9 @@ func update(delta: float) -> void:
 	_solutes = _solutes.dissolve(delta)
 
 # 生成中のSolutionを取り出す
-func get_solution() -> String:
-	# ここでは仮に溶液の状態を文字列で返す
-	var solution = "生成中の溶液: 未実装"
-	return solution
+func get_solution() -> Solution:
+	if _solutes == null: return null
+	return Solution.new(_solutes)
 
 func _to_string() -> String:
 	return str(_solutes)

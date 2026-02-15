@@ -29,14 +29,6 @@ offset_top = 109.0
 offset_right = 100.0
 offset_bottom = 256.0
 
-[node name="TempLabel" type="Label" parent="UIContainer" unique_id=1515697727]
-layout_mode = 2
-text = "温度: 0°C"
-
-[node name="TimeLabel" type="Label" parent="UIContainer" unique_id=1687027220]
-layout_mode = 2
-text = "時間: 0秒"
-
 [node name="StatusLabel" type="Label" parent="UIContainer" unique_id=2055988799]
 layout_mode = 2
 text = "状態: 待機中"
