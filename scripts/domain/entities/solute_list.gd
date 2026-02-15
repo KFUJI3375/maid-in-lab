@@ -44,3 +44,6 @@ func dissolve(delta: float) -> SoluteList:
 # 配列を複製して返す
 func to_array() -> Array[Solute]:
 	return _solutes.duplicate()
+
+func duplicate() -> SoluteList:
+	return SoluteList.new(_solutes.duplicate())

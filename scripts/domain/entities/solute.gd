@@ -49,6 +49,6 @@ func dissolve(delta: float) -> SoluteList:
 		new_solute])
 
 static func CreateHerb(p_mass: float) -> Solute:
-	return Solute.new("Mystic Herb", p_mass, 0.5, [])
+	return Solute.new("Herb", p_mass, 0.5, [])
 static func CreateHealingIngredient(p_mass: float) -> Solute:
 	return Solute.new("Healing Ingredient", p_mass, 0.0, [Efficacy.CreateHealing()])

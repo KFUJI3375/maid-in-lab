@@ -29,14 +29,15 @@ offset_top = 109.0
 offset_right = 100.0
 offset_bottom = 256.0
 
-[node name="StatusLabel" type="Label" parent="UIContainer" unique_id=2055988799]
-layout_mode = 2
-text = "状態: 待機中"
-
 [node name="AddHerbButton" type="Button" parent="UIContainer" unique_id=1856014446]
 layout_mode = 2
 text = "薬草を入れる"
 
-[node name="HeatButton" type="Button" parent="UIContainer" unique_id=1814861761]
+[node name="MaterialList" type="ItemList" parent="UIContainer" unique_id=1950000001]
 layout_mode = 2
-text = "加熱開始"
+max_text_lines = 5
+auto_width = true
+auto_height = true
+item_count = 1
+max_columns = 2
+item_0/text = "aaaa"

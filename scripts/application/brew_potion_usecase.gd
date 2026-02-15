@@ -9,9 +9,9 @@ func _init() -> void:
 	_process = AlchemyProcess.new(SoluteList.new([Solute.CreateHerb(1)]))
 
 # 生成中のSolutionを取り出す
-func get_solution() -> Solution: # ここでは仮に溶液の状態を文字列で返す
+func get_solution_inventory() -> void:
 	var solution = _process.get_solution()
-	return solution
+	GlobalData.solution_inventory.append(solution)
 
 func update(delta: float) -> void:
 	if _process:
