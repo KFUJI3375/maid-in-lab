@@ -8,28 +8,17 @@ extends Control
 
 # Use Case
 var brew_use_case: BrewPotionUseCase = null
-var fps_label: Label
 
 func _ready():
-	# FPS表示ラベル作成（デバッグ用）
-	fps_label = Label.new()
-	fps_label.position = Vector2(10, 10)
-	fps_label.add_theme_color_override("font_color", Color.YELLOW)
-	add_child(fps_label)
-
 	# UIボタンのシグナル接続
 	if add_herb_button:
 		add_herb_button.pressed.connect(_on_add_herb_pressed)
 
 
 func _process(delta):
-	# FPS表示更新（デバッグ用）
-	fps_label.text = "FPS: %d (Max: %d)" % [
-		Engine.get_frames_per_second(),
-		Engine.max_fps
-	]
 	if brew_use_case:
 		brew_use_case.update(delta)
+
 func _on_add_herb_pressed():
 	if brew_use_case == null:
 		brew_use_case = BrewPotionUseCase.new()
