@@ -3,7 +3,7 @@ extends RefCounted
 
 var _solutes: Array[Solute]
 
-func _init(solutes: Array[Solute]) -> void:
+func _init(solutes: Array[Solute] = []) -> void:
 	_solutes = solutes.duplicate() # 配列を複製して保持する
 
 func _to_string() -> String:

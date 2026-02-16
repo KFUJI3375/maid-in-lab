@@ -42,14 +42,16 @@ func _on_add_herb_pressed():
 			print("アイテムのメタデータが見つかりません")
 			return
 		var item_name = metadata[0]
-		var item_resource = ResourceManager.get_material(item_name)
-		if item_resource == null:
-			print("アイテムリソースが見つかりません: %s" % item_name)
-			return
-		var solutes = item_resource.get_solutes()
 		var qty = metadata[1]
 		print("選択されたアイテム: %s x%d" % [item_name, qty])
-		brew_use_case = BrewPotionUseCase.new()
+		var material_items = GlobalData.material_inventory.pull(item_name, 1) # インベントリから1つ減らす
+		var solutes = SoluteList.new()
+		for item in material_items:
+			var material_solutes = SoluteList.new(item.get_solutes())
+			solutes = solutes.append_list(material_solutes)
+			print("素材 %s から溶質を抽出: %s" % [item.name, material_solutes])
+			# ここで素材をビーカーに入れるアニメーションなどを再生してもいいかもしれない
+		brew_use_case = BrewPotionUseCase.new(solutes)
 		brew_use_case.state_changed.connect(_on_state_changed)
 		add_herb_button.text = "取り出す"
 	else:

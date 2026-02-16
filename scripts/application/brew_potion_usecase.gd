@@ -5,8 +5,8 @@ signal state_changed(state: String)
 
 var _process: AlchemyProcess = null
 
-func _init() -> void:
-	_process = AlchemyProcess.new(SoluteList.new([Solute.CreateHerb(1)]))
+func _init(solutes: SoluteList) -> void:
+	_process = AlchemyProcess.new(solutes)
 
 # 生成中のSolutionを取り出す
 func get_solution_inventory() -> void:
