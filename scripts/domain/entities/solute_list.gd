@@ -31,10 +31,23 @@ func append(solute: Solute) -> SoluteList:
 
 # 他のSoluteListを結合した新しいSoluteListを返す
 func append_list(others: SoluteList) -> SoluteList:
-	var result = self ;
+	# 現在のリストと渡されたリストを名前キーでまとめて一度にマージする
+	var map: Dictionary = {}
+	for existing_solute in _solutes:
+		var name = existing_solute._resource.name
+		map[name] = existing_solute.duplicate()
+
 	for solute in others.to_array():
-		result = result.append(solute)
-	return result
+		var name = solute._resource.name
+		if map.has(name):
+			map[name] = solute.combine(map[name])
+		else:
+			map[name] = solute.duplicate()
+
+	var result_array: Array[Solute] = []
+	for s in map.values():
+		result_array.append(s)
+	return SoluteList.new(result_array)
 
 # すべての溶質を反応させた新しいSoluteListを返す
 func dissolve(delta: float) -> SoluteList:
