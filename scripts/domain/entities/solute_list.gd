@@ -11,20 +11,23 @@ func _to_string() -> String:
 
 # 新しい溶質を追加した新しいSoluteListを返す
 func append(solute: Solute) -> SoluteList:
-	var current_solutes: Array[Solute] = _solutes.duplicate()
-	var new_solutes: Array[Solute] = []
-	# _solutesに同名の溶質が存在する場合は、量を加算する
-	var has_same_name = false
-	for existing_solute in current_solutes:
-		if solute.is_same_name(existing_solute):
-			new_solutes.append(solute.combine(existing_solute))
-			has_same_name = true
-		else:
-			new_solutes.append(existing_solute.duplicate())
-	# 同名の溶質が存在しない場合は、新しい溶質を追加する
-	if not has_same_name:
-		new_solutes.append(solute.duplicate())
-	return SoluteList.new(new_solutes)
+	# 名前をキーにしたマップで既存の溶質を集約し、渡された溶質をマージする
+	var map: Dictionary = {}
+	for existing_solute in _solutes:
+		var name = existing_solute._resource.name
+		map[name] = existing_solute.duplicate()
+
+	var in_name = solute._resource.name
+	if map.has(in_name):
+		# 既存のものと結合して新しいSoluteにする
+		map[in_name] = solute.combine(map[in_name])
+	else:
+		map[in_name] = solute.duplicate()
+
+	var result_array: Array[Solute] = []
+	for s in map.values():
+		result_array.append(s)
+	return SoluteList.new(result_array)
 
 # 他のSoluteListを結合した新しいSoluteListを返す
 func append_list(others: SoluteList) -> SoluteList:
